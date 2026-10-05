@@ -39,8 +39,15 @@ async function scrape() {
     });
 
     const rawJobs = await page.evaluate(() => {
+      // Excludes "/nav-19" links: confirmed from a real run that these duplicate
+      // every job title but carry generic placeholder metadata ("This Job is
+      // Remote" / "Administrative" for every single one, regardless of the
+      // actual posting) -- almost certainly a related/recent-jobs widget that
+      // happens to reuse the same href pattern.
       const titleLinks = Array.from(
-        document.querySelectorAll('a[href*="/jobs/job-detail/"]'),
+        document.querySelectorAll(
+          'a[href*="/jobs/job-detail/"]:not([href*="/nav-19"])',
+        ),
       );
 
       return titleLinks.map((titleLink) => {
@@ -122,3 +129,10 @@ async function scrape() {
 }
 
 module.exports = { scrape };
+
+if (require.main === module) {
+  scrape().then((data) => {
+    console.log(JSON.stringify(data, null, 2));
+    console.log(`\nTotal jobs scraped: ${data.length}`);
+  });
+}

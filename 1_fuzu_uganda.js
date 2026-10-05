@@ -124,7 +124,7 @@ async function scrape() {
         location: r.location || "Uganda",
         industry_sector: r.sector,
         type: r.type,
-        amount: r.amount,
+        amount: r.amount || "Not Disclosed",
         time_added: r.posted,
         description: r.desc,
         url_link: r.href,
