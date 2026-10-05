@@ -1,0 +1,46 @@
+{
+  "run_at": "2026-10-05T02:31:01.994Z",
+  "total_jobs": 145,
+  "sources": [
+    {
+      "source": "Fuzu Uganda",
+      "job_count": 10,
+      "error": null
+    },
+    {
+      "source": "BrighterMonday Uganda",
+      "job_count": 16,
+      "error": null
+    },
+    {
+      "source": "ReliefWeb Uganda",
+      "job_count": 20,
+      "error": null
+    },
+    {
+      "source": "Q-Sourcing Servtec",
+      "job_count": 8,
+      "error": null
+    },
+    {
+      "source": "Jiji Uganda Jobs",
+      "job_count": 0,
+      "error": null
+    },
+    {
+      "source": "Great Uganda Jobs",
+      "job_count": 51,
+      "error": null
+    },
+    {
+      "source": "PSC Uganda",
+      "job_count": 0,
+      "error": null
+    },
+    {
+      "source": "ImpactPool Uganda",
+      "job_count": 40,
+      "error": null
+    }
+  ]
+}

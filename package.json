@@ -1,0 +1,22 @@
+{
+  "name": "uganda-job-scrapers",
+  "version": "1.0.0",
+  "description": "Playwright-based job scrapers for Ugandan/East African job aggregator",
+  "main": "run_all.js",
+  "scripts": {
+    "install-browsers": "playwright install chromium",
+    "scrape:all": "node run_all.js",
+    "scrape:fuzu": "node 1_fuzu_uganda.js",
+    "scrape:brightermonday": "node 2_brightermonday_uganda.js",
+    "scrape:reliefweb": "node 3_reliefweb_uganda.js",
+    "scrape:qsourcing": "node 4_qsourcing_servtec.js",
+    "scrape:jiji": "node 5_jiji_uganda_jobs.js",
+    "scrape:greatugandajobs": "node 6_great_uganda_jobs.js",
+    "scrape:psc": "node 7_psc_uganda.js",
+    "scrape:impactpool": "node 8_impactpool_uganda.js"
+  },
+  "dependencies": {
+    "playwright": "^1.63.0"
+  },
+  "license": "MIT"
+}
