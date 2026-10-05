@@ -110,7 +110,7 @@ async function scrape() {
             ? j.category.replace(/\s*jobs in uganda$/i, "").trim()
             : "Not Specified",
           type: j.type || "Not Specified",
-          amount: "Not Specified", // not published on the list page
+          amount: "Not Disclosed", // not published on the list page
           time_added: relativeToIso(j.posted),
           description: "", // only on the detail page; not fetched in this pass
           url_link: j.url,

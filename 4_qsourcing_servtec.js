@@ -52,7 +52,7 @@ async function scrape() {
           location: j.location || "Not Specified",
           industry_sector: "Not Specified", // not exposed on the list page
           type: j.type || "Not Specified",
-          amount: "Not Specified", // qsourcing never publishes salary on listings
+          amount: "Not Disclosed", // qsourcing never publishes salary on listings
           time_added: j.datetime ? `${j.datetime}T00:00:00.000Z` : "",
           description: "", // only available on the detail page; not fetched in this pass
           url_link: j.url,

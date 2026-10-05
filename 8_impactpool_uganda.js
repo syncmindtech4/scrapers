@@ -71,7 +71,7 @@ async function scrape() {
           location: j.location || "Not Specified",
           industry_sector: "Not Specified", // Impactpool doesn't expose sector on the list page
           type: j.type || "Not Specified",
-          amount: "Not Specified", // Impactpool (UN/NGO jobs) never publishes salary on listings
+          amount: "Not Disclosed", // Impactpool (UN/NGO jobs) never publishes salary on listings
           time_added: "", // not shown on list page; would need a detail-page fetch like ReliefWeb
           description: "", // same as above
           url_link: j.url,

@@ -133,7 +133,7 @@ async function scrape() {
           type: j.type || "Not Specified",
           amount:
             /confidential/i.test(j.amountRaw) || !j.amountRaw
-              ? "Not Specified"
+              ? "Not Disclosed"
               : j.amountRaw,
           time_added: relativeToIso(j.posted),
           description: j.description || "",
