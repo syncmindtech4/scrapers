@@ -4,24 +4,29 @@
  * CommonJS / Playwright / Node.js
  */
 
-const { chromium } = require('playwright');
+const { chromium } = require("playwright");
 
 const USER_AGENT =
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
-  '(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
+  "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
 
-const BLOCKED_RESOURCE_TYPES = new Set(['image', 'media', 'font', 'stylesheet']);
+const BLOCKED_RESOURCE_TYPES = new Set([
+  "image",
+  "media",
+  "font",
+  "stylesheet",
+]);
 
 // Extra hostnames commonly used for ads/trackers/analytics that we don't need
 // for scraping job listings. Extend per-site if needed.
 const BLOCKED_URL_FRAGMENTS = [
-  'google-analytics',
-  'googletagmanager',
-  'doubleclick',
-  'facebook.net',
-  'hotjar',
-  'googlesyndication',
-  'adservice',
+  "google-analytics",
+  "googletagmanager",
+  "doubleclick",
+  "facebook.net",
+  "hotjar",
+  "googlesyndication",
+  "adservice",
 ];
 
 /**
@@ -31,13 +36,13 @@ const BLOCKED_URL_FRAGMENTS = [
 async function launchBrowser() {
   const browser = await chromium.launch({
     headless: true,
-    args: ['--disable-blink-features=AutomationControlled'],
+    args: ["--disable-blink-features=AutomationControlled"],
   });
 
   const context = await browser.newContext({
     userAgent: USER_AGENT,
     viewport: { width: 1366, height: 900 },
-    locale: 'en-US',
+    locale: "en-US",
   });
 
   return { browser, context };
@@ -49,7 +54,7 @@ async function launchBrowser() {
  * speed up scraping.
  */
 async function blockHeavyResources(pageOrContext) {
-  await pageOrContext.route('**/*', (route) => {
+  await pageOrContext.route("**/*", (route) => {
     const request = route.request();
     const resourceType = request.resourceType();
     const url = request.url();
@@ -70,13 +75,13 @@ async function blockHeavyResources(pageOrContext) {
  * Safely runs an extraction function, returning a fallback value
  * ("Not Specified" by default) if it throws or returns empty.
  */
-async function safeExtract(fn, fallback = 'Not Specified') {
+async function safeExtract(fn, fallback = "Not Specified") {
   try {
     const result = await fn();
-    if (result === null || result === undefined || result === '') {
+    if (result === null || result === undefined || result === "") {
       return fallback;
     }
-    return typeof result === 'string' ? result.trim() : result;
+    return typeof result === "string" ? result.trim() : result;
   } catch (err) {
     return fallback;
   }
@@ -88,10 +93,10 @@ async function safeExtract(fn, fallback = 'Not Specified') {
  */
 function resolveUrl(base, maybeRelative) {
   try {
-    if (!maybeRelative) return 'Not Specified';
+    if (!maybeRelative) return "Not Specified";
     return new URL(maybeRelative, base).toString();
   } catch (err) {
-    return 'Not Specified';
+    return "Not Specified";
   }
 }
 
@@ -99,6 +104,28 @@ function resolveUrl(base, maybeRelative) {
  * Builds a standardized job object, filling in any missing fields
  * with sensible fallbacks so every scraper returns a uniform shape.
  */
+// function buildJobObject({
+//   title,
+//   location,
+//   industry_sector,
+//   type,
+//   amount,
+//   time_added,
+//   description,
+//   url_link,
+// }) {
+//   return {
+//     title: title || 'Not Specified',
+//     location: location || 'Not Specified',
+//     industry_sector: industry_sector || 'Not Specified',
+//     type: type || 'Not Specified',
+//     amount: amount || 'Not Specified',
+//     time_added: time_added || new Date().toISOString(),
+//     description: description || 'Not Specified',
+//     url_link: url_link || 'Not Specified',
+//   };
+// }
+
 function buildJobObject({
   title,
   location,
@@ -108,16 +135,18 @@ function buildJobObject({
   time_added,
   description,
   url_link,
+  employer,
 }) {
   return {
-    title: title || 'Not Specified',
-    location: location || 'Not Specified',
-    industry_sector: industry_sector || 'Not Specified',
-    type: type || 'Not Specified',
-    amount: amount || 'Not Specified',
+    title: title || "Not Specified",
+    location: location || "Not Specified",
+    industry_sector: industry_sector || "Not Specified",
+    type: type || "Not Specified",
+    amount: amount || "Not Disclosed",
     time_added: time_added || new Date().toISOString(),
-    description: description || 'Not Specified',
-    url_link: url_link || 'Not Specified',
+    description: description || "Not Specified",
+    url_link: url_link || "Not Specified",
+    employer: employer || "Not Specified",
   };
 }
 

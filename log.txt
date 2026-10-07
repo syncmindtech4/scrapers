@@ -1,0 +1,8 @@
+[fuzu_uganda] detected 3 page(s)
+[fuzu_uganda] waiting 4625ms before page 2
+[fuzu_uganda] diagnostics for page 2:
+  HTTP status: 403
+  Final URL: https://www.fuzu.com/uganda/job?page=2
+  Page title: Just a moment...
+  Body start: www.fuzu.com Performing security verification  This website uses a security service to protect against malicious bots. This page is displayed while the website verifies you are not a bot.  Ray ID: a46986f088b5a6ab Performance and Security by Cloudflare Privacy
+[fuzu_uganda] page 2 produced no cards, stopping.
