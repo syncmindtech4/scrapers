@@ -1,10 +1,12 @@
-/**
- * _utils.js
- * Shared helpers for all job scrapers.
- * CommonJS / Playwright / Node.js
- */
-
+const { addExtra } = require("playwright-extra");
+const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const { chromium } = require("playwright");
+
+const chromiumStealth = addExtra(chromium);
+chromiumStealth.use(StealthPlugin());
+
+// ... keep the rest of your _utils.js exactly as it was ...
+// (Just change `chromium.launch` to `chromiumStealth.launch` inside launchBrowser)
 
 const USER_AGENT =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
@@ -31,12 +33,17 @@ const BLOCKED_URL_FRAGMENTS = [
 
 /**
  * Launches a headless Chromium browser + context configured with a
- * realistic user agent and viewport.
+ * realistic user agent and viewport, PLUS stealth to bypass basic bot detection.
  */
 async function launchBrowser() {
-  const browser = await chromium.launch({
+  // 3. Use chromiumStealth instead of regular chromium
+  const browser = await chromiumStealth.launch({
     headless: true,
-    args: ["--disable-blink-features=AutomationControlled"],
+    args: [
+      "--disable-blink-features=AutomationControlled",
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+    ],
   });
 
   const context = await browser.newContext({
@@ -104,28 +111,6 @@ function resolveUrl(base, maybeRelative) {
  * Builds a standardized job object, filling in any missing fields
  * with sensible fallbacks so every scraper returns a uniform shape.
  */
-// function buildJobObject({
-//   title,
-//   location,
-//   industry_sector,
-//   type,
-//   amount,
-//   time_added,
-//   description,
-//   url_link,
-// }) {
-//   return {
-//     title: title || 'Not Specified',
-//     location: location || 'Not Specified',
-//     industry_sector: industry_sector || 'Not Specified',
-//     type: type || 'Not Specified',
-//     amount: amount || 'Not Specified',
-//     time_added: time_added || new Date().toISOString(),
-//     description: description || 'Not Specified',
-//     url_link: url_link || 'Not Specified',
-//   };
-// }
-
 function buildJobObject({
   title,
   location,

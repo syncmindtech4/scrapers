@@ -16,7 +16,9 @@
     "scrape:impactpool": "node 8_impactpool_uganda.js"
   },
   "dependencies": {
-    "playwright": "^1.63.0"
+    "playwright": "^1.63.0",
+    "playwright-extra": "^4.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
   },
   "license": "MIT"
 }
