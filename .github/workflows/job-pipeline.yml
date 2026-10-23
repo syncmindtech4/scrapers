@@ -1,0 +1,48 @@
+name: job-pipeline
+
+on:
+  schedule:
+    - cron: "0 3 * * *" # 03:00 UTC = 06:00 East Africa Time, daily
+  workflow_dispatch: # manual "Run workflow" button in the Actions tab
+
+concurrency:
+  group: job-pipeline # never run two pipelines at once
+  cancel-in-progress: false
+
+jobs:
+  scrape-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium (+ system libraries)
+        run: npx playwright install --with-deps chromium
+
+      - name: Run scrape + publish pipeline
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          INGEST_SECRET: ${{ secrets.INGEST_SECRET }}
+        run: node run_all.js
+
+      - name: Print run summary to logs
+        if: always()
+        run: cat output/summary.json || true
+
+      - name: Upload run artifacts (jobs.json + summary.json)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: run-output-${{ github.run_number }}
+          path: output/
+          retention-days: 7

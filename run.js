@@ -12,27 +12,22 @@
 const fs = require("fs");
 const path = require("path");
 
-// ----- Supabase config: env vars first, then local secrets.json -----
-let fileSecrets = {};
-try {
-  fileSecrets = require("./secrets.json");
-} catch {}
+// ----- Load secrets: .env locally, real env vars in CI -----
+require("dotenv").config();
 
 const SUPABASE_URL =
-  process.env.SUPABASE_URL ||
-  fileSecrets.SUPABASE_URL ||
-  "https://xjpzyspvkavxszebcalw.supabase.co";
-const SUPABASE_ANON_KEY =
-  process.env.SUPABASE_ANON_KEY || fileSecrets.SUPABASE_ANON_KEY || "";
-const INGEST_SECRET =
-  process.env.INGEST_SECRET || fileSecrets.INGEST_SECRET || "";
+  process.env.SUPABASE_URL || "https://xjpzyspvkavxszebcalw.supabase.co";
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || "";
+const INGEST_SECRET = process.env.INGEST_SECRET || "";
 
 if (!SUPABASE_ANON_KEY || !INGEST_SECRET) {
   console.error(
-    "❌ Missing SUPABASE_ANON_KEY / INGEST_SECRET (env vars or secrets.json).",
+    "❌ Missing SUPABASE_ANON_KEY / INGEST_SECRET. Check your .env file.",
   );
   process.exit(1);
 }
+
+const INGEST_ENDPOINT = `${SUPABASE_URL}/functions/v1/ingest-jobs`;
 const CHUNK_SIZE = 50;
 const CONCURRENCY = 2; // Playwright is heavy; 2 browsers at a time is safe
 

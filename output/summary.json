@@ -1,6 +1,6 @@
 {
-  "ranAt": "2026-10-23T20:39:21.661Z",
-  "durationSec": 115.2,
+  "ranAt": "2026-10-23T21:55:08.679Z",
+  "durationSec": 95.6,
   "pushed": true,
   "totals": {
     "jobs": 23,
@@ -12,7 +12,7 @@
     {
       "source": "fuzu",
       "jobs": 23,
-      "durationSec": 112.2,
+      "durationSec": 92.2,
       "error": null,
       "push": {
         "inserted": 0,

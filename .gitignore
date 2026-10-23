@@ -1,6 +1,15 @@
 # Dependencies
-# ==========================================
 node_modules/
+
+# Secrets — NEVER commit these
+.env
+
+# Local run artifacts (CI uploads its own copies)
 output/
-secrets.json
-.env.local
+run.log
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
