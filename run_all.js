@@ -6,18 +6,21 @@
  * Usage: node run_all.js
  */
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
 const scrapers = [
-  { name: 'Fuzu Uganda', mod: require('./1_fuzu_uganda') },
-  { name: 'BrighterMonday Uganda', mod: require('./2_brightermonday_uganda') },
-  { name: 'ReliefWeb Uganda', mod: require('./3_reliefweb_uganda') },
-  { name: 'Q-Sourcing Servtec', mod: require('./4_qsourcing_servtec') },
-  { name: 'Jiji Uganda Jobs', mod: require('./5_jiji_uganda_jobs') },
-  { name: 'Great Uganda Jobs', mod: require('./6_great_uganda_jobs') },
-  { name: 'PSC Uganda', mod: require('./7_psc_uganda') },
-  { name: 'ImpactPool Uganda', mod: require('./8_impactpool_uganda') },
+  { name: "Fuzu Uganda", mod: require("./scrapers/fuzu_uganda") },
+  {
+    name: "BrighterMonday Uganda",
+    mod: require("./scrapers/brightermonday_uganda"),
+  },
+  { name: "ReliefWeb Uganda", mod: require("./scrapers/reliefweb_uganda") },
+  { name: "Q-Sourcing Servtec", mod: require("./scrapers/qsourcing_servtec") },
+  { name: "Jiji Uganda Jobs", mod: require("./5_jiji_uganda_jobs") },
+  { name: "Great Uganda Jobs", mod: require("./scrapers/great_uganda_jobs") },
+  { name: "PSC Uganda", mod: require("./7_psc_uganda") },
+  { name: "ImpactPool Uganda", mod: require("./8_impactpool_uganda") },
 ];
 
 // Run scrapers with limited concurrency to avoid overloading the machine
@@ -42,35 +45,43 @@ async function runWithConcurrency(items, limit, worker) {
 }
 
 async function main() {
-  console.log(`Starting scrape of ${scrapers.length} sources (concurrency: ${CONCURRENCY})...\n`);
+  console.log(
+    `Starting scrape of ${scrapers.length} sources (concurrency: ${CONCURRENCY})...\n`,
+  );
 
   const startTime = Date.now();
 
-  const outcomes = await runWithConcurrency(scrapers, CONCURRENCY, async (source) => {
-    const sourceStart = Date.now();
-    try {
-      const jobs = await source.mod.scrape();
-      const durationSec = ((Date.now() - sourceStart) / 1000).toFixed(1);
-      console.log(`✔ ${source.name}: ${jobs.length} jobs (${durationSec}s)`);
-      return { source: source.name, jobs, error: null };
-    } catch (err) {
-      const durationSec = ((Date.now() - sourceStart) / 1000).toFixed(1);
-      console.error(`✘ ${source.name}: failed after ${durationSec}s — ${err.message}`);
-      return { source: source.name, jobs: [], error: err.message };
-    }
-  });
+  const outcomes = await runWithConcurrency(
+    scrapers,
+    CONCURRENCY,
+    async (source) => {
+      const sourceStart = Date.now();
+      try {
+        const jobs = await source.mod.scrape();
+        const durationSec = ((Date.now() - sourceStart) / 1000).toFixed(1);
+        console.log(`✔ ${source.name}: ${jobs.length} jobs (${durationSec}s)`);
+        return { source: source.name, jobs, error: null };
+      } catch (err) {
+        const durationSec = ((Date.now() - sourceStart) / 1000).toFixed(1);
+        console.error(
+          `✘ ${source.name}: failed after ${durationSec}s — ${err.message}`,
+        );
+        return { source: source.name, jobs: [], error: err.message };
+      }
+    },
+  );
 
   const allJobs = outcomes.flatMap((o) => o.jobs);
 
-  const outputDir = path.join(__dirname, 'output');
+  const outputDir = path.join(__dirname, "output");
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
   }
 
-  const jobsFile = path.join(outputDir, 'jobs.json');
-  fs.writeFileSync(jobsFile, JSON.stringify(allJobs, null, 2), 'utf-8');
+  const jobsFile = path.join(outputDir, "jobs.json");
+  fs.writeFileSync(jobsFile, JSON.stringify(allJobs, null, 2), "utf-8");
 
-  const summaryFile = path.join(outputDir, 'summary.json');
+  const summaryFile = path.join(outputDir, "summary.json");
   fs.writeFileSync(
     summaryFile,
     JSON.stringify(
@@ -84,9 +95,9 @@ async function main() {
         })),
       },
       null,
-      2
+      2,
     ),
-    'utf-8'
+    "utf-8",
   );
 
   const totalSec = ((Date.now() - startTime) / 1000).toFixed(1);
@@ -96,6 +107,6 @@ async function main() {
 }
 
 main().catch((err) => {
-  console.error('Fatal error running scrapers:', err);
+  console.error("Fatal error running scrapers:", err);
   process.exit(1);
 });

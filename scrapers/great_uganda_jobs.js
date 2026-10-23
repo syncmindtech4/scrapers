@@ -6,7 +6,7 @@ const {
   launchBrowser,
   blockHeavyResources,
   buildJobObject,
-} = require("./_utils");
+} = require("../_utils");
 
 const LIST_URL = "https://www.greatugandajobs.com/jobs/";
 const DETAIL_CONCURRENCY = 3;

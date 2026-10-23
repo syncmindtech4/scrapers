@@ -1,3 +1,6 @@
 # Dependencies
 # ==========================================
 node_modules/
+output/
+secrets.json
+.env.local

@@ -12,7 +12,7 @@ const {
   launchBrowser,
   blockHeavyResources,
   buildJobObject,
-} = require("./_utils");
+} = require("../_utils");
 
 const LIST_URL = "https://www.brightermonday.co.ug/jobs";
 const MAX_PAGES = 10; // Adjust this to scrape more/fewer pages

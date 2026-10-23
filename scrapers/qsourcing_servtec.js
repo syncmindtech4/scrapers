@@ -12,7 +12,7 @@ const {
   launchBrowser,
   blockHeavyResources,
   buildJobObject,
-} = require("./_utils");
+} = require("../_utils");
 
 const LIST_URL = "https://qsourcing.com/jobs-in-uganda/";
 const DETAIL_CONCURRENCY = 3;

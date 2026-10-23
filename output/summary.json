@@ -1,46 +1,25 @@
 {
-  "run_at": "2026-10-16T13:51:02.330Z",
-  "total_jobs": 61,
+  "ranAt": "2026-10-23T20:39:21.661Z",
+  "durationSec": 115.2,
+  "pushed": true,
+  "totals": {
+    "jobs": 23,
+    "inserted": 0,
+    "updated": 23,
+    "rejected": 0
+  },
   "sources": [
     {
-      "source": "Fuzu Uganda",
-      "job_count": 10,
-      "error": null
-    },
-    {
-      "source": "BrighterMonday Uganda",
-      "job_count": 16,
-      "error": null
-    },
-    {
-      "source": "ReliefWeb Uganda",
-      "job_count": 20,
-      "error": null
-    },
-    {
-      "source": "Q-Sourcing Servtec",
-      "job_count": 15,
-      "error": null
-    },
-    {
-      "source": "Jiji Uganda Jobs",
-      "job_count": 0,
-      "error": null
-    },
-    {
-      "source": "Great Uganda Jobs",
-      "job_count": 0,
-      "error": null
-    },
-    {
-      "source": "PSC Uganda",
-      "job_count": 0,
-      "error": null
-    },
-    {
-      "source": "ImpactPool Uganda",
-      "job_count": 0,
-      "error": null
+      "source": "fuzu",
+      "jobs": 23,
+      "durationSec": 112.2,
+      "error": null,
+      "push": {
+        "inserted": 0,
+        "updated": 23,
+        "rejected": 0,
+        "errors": []
+      }
     }
   ]
 }

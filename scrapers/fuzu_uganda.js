@@ -12,7 +12,7 @@ const {
   launchBrowser,
   blockHeavyResources,
   buildJobObject,
-} = require("./_utils");
+} = require("../_utils");
 
 const BASE_URL = "https://www.fuzu.com/uganda/job";
 const CARD_SELECTOR = "div.b2c-card";

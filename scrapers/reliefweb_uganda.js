@@ -11,7 +11,7 @@ const {
   launchBrowser,
   blockHeavyResources,
   buildJobObject,
-} = require("./_utils");
+} = require("../_utils");
 
 const BASE_URL = "https://reliefweb.int/jobs?advanced-search=%28C240%29";
 const DETAIL_CONCURRENCY = 3;
