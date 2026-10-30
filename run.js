@@ -49,6 +49,7 @@ const SOURCES = [
   { id: "reliefweb", file: "./scrapers/reliefweb_uganda" },
   { id: "qsourcing", file: "./scrapers/qsourcing_servtec" },
   { id: "greatugandajobs", file: "./scrapers/great_uganda_jobs" },
+  { id: "jobadverts", file: "./scrapers/jobadverts_ug" },
 ];
 
 const log = (msg) => console.log(msg);
