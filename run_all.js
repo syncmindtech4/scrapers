@@ -50,6 +50,9 @@ const SOURCES = [
   { id: "qsourcing", file: "./scrapers/qsourcing_servtec" },
   { id: "greatugandajobs", file: "./scrapers/great_uganda_jobs" },
   { id: "jobadverts", file: "./scrapers/jobadverts_ug" },
+  { id: "unjobs", file: "./scrapers/unjobs_uganda" },
+  { id: "jobs_co_ug", file: "./scrapers/jobs_co_ug" },
+  { id: "accaglobal", file: "./scrapers/accaglobal_ug" },
 ];
 
 const log = (msg) => console.log(msg);

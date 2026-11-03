@@ -2,7 +2,7 @@ name: job-pipeline
 
 on:
   schedule:
-    - cron: "8 8 * * *"    # 08:08 UTC = 11:08 AM EAT, daily
+    - cron: "8 8 * * *" # 08:08 UTC = 11:08 AM EAT, daily
   workflow_dispatch:
 
 concurrency:
@@ -33,7 +33,7 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
           INGEST_SECRET: ${{ secrets.INGEST_SECRET }}
-        run: node run.js
+        run: node run_all.js
 
       - name: Print run summary to logs
         if: always()
