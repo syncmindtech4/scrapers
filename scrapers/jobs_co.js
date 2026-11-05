@@ -3,7 +3,7 @@
  * Pure API scraper for jobs.co.ug (Strapi CMS backend)
  * Handles nested employer objects and strips HTML from descriptions.
  */
-const { buildJobObject } = require("../_utils");
+const { buildJobObject, normalizeCountry } = require("../_utils");
 const { matchSector } = require("./generic_engine");
 
 const API_URL = "https://cms.jobs.co.ug/api/jobs";
@@ -93,18 +93,26 @@ async function scrape() {
         ? `https://jobs.co.ug/jobs/${slug}`
         : j.url_link || `https://jobs.co.ug/`;
 
-      return buildJobObject({
-        title: title,
-        url_link: publicUrl,
-        employer: employerName,
-        description: cleanDesc.substring(0, 1500) || "Not Specified",
-        location: location,
-        // Run sector matching on the clean text
-        industry_sector: matchSector(cleanDesc + " " + title),
-        type: type,
-        amount: salary,
-        time_added: j.publishedAt || j.createdAt || new Date().toISOString(),
-      });
+      return Object.assign(
+        buildJobObject({
+          title: title,
+          url_link: publicUrl,
+          employer: employerName,
+          description: cleanDesc.substring(0, 1500) || "Not Specified",
+          location: location,
+          // Run sector matching on the clean text
+          industry_sector: matchSector(cleanDesc + " " + title),
+          type: type,
+          amount: salary,
+          time_added: j.publishedAt || j.createdAt || new Date().toISOString(),
+        }),
+        {
+          country: normalizeCountry(
+            j.location || "",
+            (j.employer && j.employer.country) || "Uganda",
+          ),
+        },
+      );
     });
   } catch (err) {
     console.error(`[jobs_co_ug] Fatal error:`, err.message);

@@ -151,6 +151,48 @@ async function autoScroll(page, { maxScrolls = 12, pauseMs = 800 } = {}) {
   }
 }
 
+const TARGET_COUNTRIES = [
+  "South Sudan",
+  "Uganda",
+  "Kenya",
+  "Tanzania",
+  "Rwanda",
+  "Ethiopia",
+  "Ghana",
+];
+
+const CITY_ALIASES = {
+  Uganda: [
+    "kampala",
+    "entebbe",
+    "jinja",
+    "mbale",
+    "gulu",
+    "wakiso",
+    "mbarara",
+    "fort portal",
+    "hoima",
+    "lira",
+    "arua",
+  ],
+  Kenya: ["nairobi", "mombasa", "kisumu", "nakuru", "eldoret"],
+  Tanzania: ["dar es salaam", "dodoma", "arusha", "mwanza"],
+  Rwanda: ["kigali"],
+  Ethiopia: ["addis ababa"],
+  Ghana: ["accra", "kumasi", "takoradi"],
+  "South Sudan": ["juba"],
+};
+
+function normalizeCountry(text, fallback = "Uganda") {
+  const t = (text || "").toLowerCase();
+  const byLength = [...TARGET_COUNTRIES].sort((a, b) => b.length - a.length); // "South Sudan" before others
+  for (const c of byLength) if (t.includes(c.toLowerCase())) return c;
+  for (const [country, cities] of Object.entries(CITY_ALIASES)) {
+    if (cities.some((city) => t.includes(city))) return country;
+  }
+  return fallback;
+}
+
 module.exports = {
   USER_AGENT,
   launchBrowser,
@@ -159,4 +201,6 @@ module.exports = {
   resolveUrl,
   buildJobObject,
   autoScroll,
+  normalizeCountry,
+  TARGET_COUNTRIES,
 };

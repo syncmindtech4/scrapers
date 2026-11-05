@@ -45,14 +45,15 @@ const ONLY = onlyArg
 // ----- Sources (ids match the `source` column in your jobs table) -----
 const SOURCES = [
   { id: "fuzu", file: "./scrapers/fuzu_uganda" },
-  { id: "brightermonday", file: "./scrapers/brightermonday_uganda" },
+  { id: "brightermonday", file: "./scrapers/brightermonday_ug" },
   { id: "reliefweb", file: "./scrapers/reliefweb_uganda" },
   { id: "qsourcing", file: "./scrapers/qsourcing_servtec" },
   { id: "greatugandajobs", file: "./scrapers/great_uganda_jobs" },
   { id: "jobadverts", file: "./scrapers/jobadverts_ug" },
-  { id: "unjobs", file: "./scrapers/unjobs_uganda" },
-  { id: "jobs_co_ug", file: "./scrapers/jobs_co_ug" },
-  { id: "accaglobal", file: "./scrapers/accaglobal_ug" },
+  { id: "unjobs", file: "./scrapers/unjobs" },
+  { id: "jobs_co", file: "./scrapers/jobs_co" },
+  { id: "accaglobal", file: "./scrapers/accaglobal" },
+  { id: "africacareers", file: "./scrapers/africacareers" },
 ];
 
 const log = (msg) => console.log(msg);

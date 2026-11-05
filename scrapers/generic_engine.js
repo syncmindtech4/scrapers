@@ -6,6 +6,7 @@ const {
   launchBrowser,
   blockHeavyResources,
   buildJobObject,
+  normalizeCountry,
 } = require("../_utils");
 
 const DETAIL_CONCURRENCY = 3;
@@ -161,7 +162,7 @@ function matchSector(text) {
 }
 
 async function scrapeGeneric(config) {
-  const { sourceId, listUrl, maxPages = 5 } = config;
+  const { sourceId, listUrl, maxPages = 5, country } = config;
   const { browser, context } = await launchBrowser();
   const allJobs = [];
   const seenUrls = new Set();
@@ -274,17 +275,23 @@ async function scrapeGeneric(config) {
     return allJobs.map((j, i) => {
       const d = details[i] || {};
       const desc = d.description || "";
-      return buildJobObject({
-        title: j.title,
-        url_link: j.url,
-        employer: d.employer || "Not Specified",
-        description: desc || "Not Specified",
-        location: d.location || "Uganda",
-        industry_sector: matchSector(desc + " " + j.title),
-        type: "Not Specified",
-        amount: "Not Disclosed",
-        time_added: new Date().toISOString(),
-      });
+      return Object.assign(
+        buildJobObject({
+          title: j.title,
+          url_link: j.url,
+          employer: d.employer || "Not Specified",
+          description: desc || "Not Specified",
+          location: normalizeCountry(d.location || "Uganda", country),
+          industry_sector: matchSector(desc + " " + j.title),
+          type: "Not Specified",
+          amount: "Not Disclosed",
+          time_added: new Date().toISOString(),
+        }),
+        {
+          country:
+            country || normalizeCountry((d.location || "") + " " + j.title),
+        },
+      );
     });
   } catch (err) {
     console.error(`[${sourceId}] Fatal error:`, err.message);
