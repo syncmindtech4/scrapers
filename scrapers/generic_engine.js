@@ -18,146 +18,68 @@ function sleep(ms) {
 
 // Smart Sector Matcher (Reused from JobAdverts)
 function matchSector(text) {
-  const lower = " " + (text || "").toLowerCase() + " ";
-  const sectors = [
+  if (!text) return "Not Specified";
+  const t = ` ${text.toLowerCase()} `;
+  const rules = [
     {
-      k: [
-        "dispatch",
-        "delivery",
-        "driver",
-        "logistics",
-        "supply chain",
-        "warehouse",
-        "transport",
-        "fleet",
-        "courier",
-      ],
-      v: "Logistics & Transport",
-    },
-    {
-      k: [
-        "bank",
-        "finance",
-        "loan",
-        "credit",
-        "insurance",
-        "microfinance",
-        "accountant",
-        "cfo",
-        "audit",
-        "tax",
-        "payroll",
-      ],
-      v: "Banking & Finance",
-    },
-    {
-      k: [
-        "health",
-        "medical",
-        "nurse",
-        "doctor",
-        "hospital",
-        "pharma",
-        "clinical",
-        "physio",
-        "wash",
-        "hygiene",
-      ],
+      re: /\b(health|medical|nurse|doctor|hospital|pharma|clinical|physio|midwif|vaccin|hygiene|nutrition|cardiovascular)\b/,
       v: "Healthcare",
     },
     {
-      k: [
-        "software",
-        "developer",
-        "backend",
-        "frontend",
-        "data engineer",
-        "ai",
-        "system admin",
-        "it support",
-        "cyber",
-        "erp",
-      ],
+      re: /\b(hotel|restaurant|chef|waiter|waitress|barista|bartender|tourism|hospitality|housekeeping|cook|catering)\b/,
+      v: "Hospitality & Tourism",
+    },
+    {
+      re: /\b(dispatch rider|delivery rider|driver|courier|fleet|crane operator|fork ?lift)\b/,
+      v: "Logistics & Transport",
+    },
+    {
+      re: /\b(bank|finance|accountant|accounting|audit|tax|cfo|treasury|credit|loan|microfinance|payroll|underwriter|actuarial)\b/,
+      v: "Banking & Finance",
+    },
+    {
+      re: /\b(software|developer|backend|frontend|full[- ]stack|data engineer|data scientist|ai lead|machine learning|system admin|it support|cyber|erp|odoo|ict|information technology|network)\b/,
       v: "IT & Technology",
     },
     {
-      k: [
-        "engineer",
-        "construction",
-        "civil",
-        "mechanical",
-        "electrical",
-        "technician",
-        "surveyor",
-        "architect",
-      ],
+      re: /\b(engineer|construction|civil|mechanical|electrical|technician|surveyor|architect|welder|mason)\b/,
       v: "Engineering & Construction",
     },
     {
-      k: [
-        "sales",
-        "marketing",
-        "brand",
-        "retail",
-        "business development",
-        "merchandiser",
-      ],
+      re: /\b(sales|marketing|brand|retail|merchandis|promoter|business development|telesales)\b/,
       v: "Sales & Marketing",
     },
     {
-      k: [
-        "hr",
-        "human resource",
-        "recruit",
-        "talent",
-        "admin",
-        "receptionist",
-        "clerk",
-      ],
-      v: "Human Resources & Admin",
-    },
-    {
-      k: [
-        "teacher",
-        "lecturer",
-        "tutor",
-        "education",
-        "school",
-        "training",
-        "intern",
-      ],
+      re: /\b(teacher|lecturer|tutor|education|school|training|intern|graduate trainee|apprentice|tutorial)\b/,
       v: "Education & Training",
     },
     {
-      k: [
-        "ngo",
-        "program officer",
-        "project officer",
-        "meal",
-        "monitoring",
-        "humanitarian",
-        "refugee",
-        "protection",
-      ],
+      re: /\b(ngo|program officer|programme officer|project officer|meal|monitoring|evaluation|humanitarian|refugee|protection|safeguarding|community development)\b/,
       v: "NGO & Development",
     },
     {
-      k: ["legal", "lawyer", "counsel", "paralegal", "compliance", "advocate"],
+      re: /\b(hr|human resource|people & culture|recruit|talent acquisition|admin|receptionist|clerk|office assistant|personal assistant|secretary)\b/,
+      v: "Human Resources & Admin",
+    },
+    {
+      re: /\b(legal|lawyer|counsel|paralegal|compliance|advocate|notary)\b/,
       v: "Legal",
     },
-    { k: ["security", "guard", "surveillance", "safety"], v: "Security" },
+    { re: /\b(security|guard|surveillance|safety officer)\b/, v: "Security" },
     {
-      k: ["agriculture", "farm", "livestock", "crop", "agronom", "poultry"],
+      re: /\b(agriculture|farm|livestock|crop|agronom|poultry|fishery|veterinary|forestry)\b/,
       v: "Agriculture",
     },
     {
-      k: ["hotel", "restaurant", "chef", "waiter", "tourism", "hospitality"],
-      v: "Hospitality & Tourism",
+      re: /\b(logistics|supply chain|warehouse|transport|procurement|purchasing|vendor|stores|inventory)\b/,
+      v: "Logistics & Procurement",
+    },
+    {
+      re: /\b(customer service|call centre|client relations|customer care)\b/,
+      v: "Customer Service",
     },
   ];
-  for (const { k, v } of sectors) {
-    if (new RegExp(`\\b(${k.join("|")})\\b`, "i").test(lower)) return v;
-  }
+  for (const { re, v } of rules) if (re.test(t)) return v;
   return "Not Specified";
 }
 

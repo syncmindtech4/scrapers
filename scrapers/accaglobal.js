@@ -85,8 +85,8 @@ async function scrapeCountry(context, country, slug) {
         details[i] = await page.evaluate(() => {
           const t = document.body.innerText;
           const emp =
-            t.match(/Employer\s*\n?\s*([^\n]+)/i) ||
-            t.match(/Company\s*\n?\s*([^\n]+)/i);
+            t.match(/Employer\s*\n\s*([A-Za-z][^\n]{2,60})/i) ||
+            t.match(/Company\s*\n\s*([A-Za-z][^\n]{2,60})/i);
           const loc = t.match(/Location\s*\n?\s*([^\n]+)/i);
           const posted = t.match(/Posted\s*\n?\s*(\d{1,2}\s+\w+\s+\d{4})/i);
           const start = t.search(

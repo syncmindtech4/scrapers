@@ -1,27 +1,39 @@
 /**
- * jobadverts_ug.js (v2 — JB Theme Specific Selectors)
+ * jobadverts_ug.js (v3 — Hygiene patched + multi-country)
  * JobAdverts Uganda — https://jobadverts.ug/jobs/
- *
- * Key Findings from Debug:
- * - Container: .jb-job-list-row
- * - Link: a.jb-job-title-link
- * - Pagination: Site loads 200 items per page by default.
- *   We will still loop pages just in case, but expect large batches.
  */
 const {
   launchBrowser,
   blockHeavyResources,
   buildJobObject,
 } = require("../_utils");
+const { matchSector } = require("./generic_engine");
 
 const BASE_URL = "https://jobadverts.ug/jobs/";
 const DETAIL_CONCURRENCY = 3;
 const DETAIL_DELAY_MS = 600;
-const MAX_DESC = 800;
-const MAX_PAGES = 5; // Since it loads 200/page, 5 pages = 1000 jobs max cap
+const MAX_DESC = 1200;
+const MAX_PAGES = 5;
+
+// Strict city-only regex — rejects garbage locations pulled from description text
+const CITY_RE =
+  /(Kampala|Entebbe|Jinja|Mbarara|Gulu|Mbale|Wakiso|Hoima|Lira|Arua|Fort Portal|Mukono|Masaka|Soroti|Kabale|Busia|Namanve|Kapeeka|Adjumani|Isingiro|Terego|Kasese|Moroto|Nakivale|Kiruhura|Mitooma|Amuria|Multiple locations|Across Uganda|Remote|Uganda)/i;
 
 function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
+}
+
+// Strip HTML tags, entities, and collapse whitespace
+function stripHtml(html) {
+  return (html || "")
+    .replace(/<[^>]*>?/gm, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 async function scrapeDetail(context, url) {
@@ -58,7 +70,9 @@ async function scrapeDetail(context, url) {
               txt.length > 2 &&
               txt.length < 60 &&
               !txt.includes("Apply") &&
-              !txt.includes("Deadline")
+              !txt.includes("Deadline") &&
+              !txt.includes("Job Purpose") &&
+              !txt.includes("Requirements")
             ) {
               employer = txt;
               break;
@@ -78,242 +92,7 @@ async function scrapeDetail(context, url) {
         }
 
         if (!description || description.length < 50) {
-          description = clean(article.innerText).slice(0, MAX_DESC);
-        }
-
-        let location = "Uganda";
-        const locMatch =
-          description.match(/Location[:\s]+([A-Za-z\s,\-]+)/i) ||
-          description.match(/Based in ([A-Za-z\s,\-]+)/i) ||
-          description.match(/Work location[:\s]+([A-Za-z\s,\-]+)/i);
-        if (locMatch) {
-          location = locMatch[1].split(",")[0].trim();
-        } else {
-          const cities = [
-            "Kampala",
-            "Entebbe",
-            "Gulu",
-            "Mbarara",
-            "Jinja",
-            "Wakiso",
-            "Arua",
-            "Mbale",
-            "Fort Portal",
-            "Mukono",
-            "Hoima",
-            "Lira",
-          ];
-          const foundCity = cities.find((c) => description.includes(c));
-          if (foundCity) location = foundCity;
-        }
-
-        // --- IMPROVED SECTOR MATCHING WITH WORD BOUNDARIES ---
-        let industry_sector = "Not Specified";
-        const lowerDesc = " " + description.toLowerCase() + " "; // Pad with spaces for boundary matching
-
-        // Order matters: Check more specific/longer phrases first
-        const sectorKeywords = [
-          {
-            k: [
-              "dispatch rider",
-              "delivery rider",
-              "driver",
-              "logistics",
-              "supply chain",
-              "warehouse",
-              "transport",
-              "fleet",
-              "courier",
-            ],
-            v: "Logistics & Transport",
-          },
-          {
-            k: [
-              "bank",
-              "finance",
-              "loan",
-              "credit",
-              "insurance",
-              "microfinance",
-              "accountant",
-              "cfo",
-              "audit",
-              "tax",
-              "payroll",
-            ],
-            v: "Banking & Finance",
-          },
-          {
-            k: [
-              "health",
-              "medical",
-              "nurse",
-              "doctor",
-              "hospital",
-              "pharma",
-              "clinical",
-              "physio",
-              "vet",
-              "wASH",
-              "hygiene",
-            ],
-            v: "Healthcare",
-          },
-          {
-            k: [
-              "software",
-              "developer",
-              "backend",
-              "frontend",
-              "full stack",
-              "data engineer",
-              "ai lead",
-              "system admin",
-              "it support",
-              "cyber",
-              "erp",
-              "odoo",
-            ],
-            v: "IT & Technology",
-          },
-          {
-            k: [
-              "engineer",
-              "construction",
-              "civil",
-              "mechanical",
-              "electrical",
-              "technician",
-              "surveyor",
-              "architect",
-            ],
-            v: "Engineering & Construction",
-          },
-          {
-            k: [
-              "sales",
-              "marketing",
-              "brand",
-              "retail",
-              "business development",
-              "merchandiser",
-              "promoter",
-            ],
-            v: "Sales & Marketing",
-          },
-          {
-            k: [
-              "hr",
-              "human resource",
-              "recruit",
-              "talent",
-              "people & culture",
-              "admin",
-              "receptionist",
-              "clerk",
-              "office assistant",
-            ],
-            v: "Human Resources & Admin",
-          },
-          {
-            k: [
-              "teacher",
-              "lecturer",
-              "tutor",
-              "education",
-              "school",
-              "training",
-              "intern",
-              "graduate trainee",
-            ],
-            v: "Education & Training",
-          },
-          {
-            k: [
-              "ngo",
-              "program officer",
-              "project officer",
-              "meal",
-              "monitoring",
-              "evaluation",
-              "humanitarian",
-              "refugee",
-              "protection",
-            ],
-            v: "NGO & Development",
-          },
-          {
-            k: [
-              "legal",
-              "lawyer",
-              "counsel",
-              "paralegal",
-              "compliance",
-              "advocate",
-            ],
-            v: "Legal",
-          },
-          {
-            k: ["security", "guard", "surveillance", "safety officer"],
-            v: "Security",
-          },
-          {
-            k: [
-              "agriculture",
-              "farm",
-              "livestock",
-              "crop",
-              "agronom",
-              "poultry",
-              "fishery",
-            ],
-            v: "Agriculture",
-          },
-          {
-            k: [
-              "hotel",
-              "restaurant",
-              "chef",
-              "waiter",
-              "tourism",
-              "hospitality",
-              "barista",
-              "cook",
-            ],
-            v: "Hospitality & Tourism",
-          },
-          {
-            k: ["procurement", "purchasing", "supply", "vendor"],
-            v: "Procurement",
-          },
-          {
-            k: [
-              "customer service",
-              "call centre",
-              "client relations",
-              "support",
-            ],
-            v: "Customer Service",
-          },
-        ];
-
-        for (const { k, v } of sectorKeywords) {
-          // Use regex with word boundaries (\b) to avoid matching "it" inside "with"
-          const pattern = new RegExp(`\\b(${k.join("|")})\\b`, "i");
-          if (pattern.test(lowerDesc)) {
-            industry_sector = v;
-            break;
-          }
-        }
-
-        // Special override for "Dispatch Rider" / "Delivery" based on Title if description fails
-        if (
-          industry_sector === "Not Specified" ||
-          industry_sector === "IT & Technology"
-        ) {
-          if (/dispatch|delivery|rider|driver|courier/i.test(title)) {
-            industry_sector = "Logistics & Transport";
-          }
+          description = clean(article.innerText).slice(0, MAX_DESC * 2);
         }
 
         let type = "Not Specified";
@@ -336,11 +115,8 @@ async function scrapeDetail(context, url) {
         return {
           title: title || "",
           employer: employer || "Not Specified",
-          location: location || "Uganda",
-          industry_sector: industry_sector || "Not Specified",
+          description: description.slice(0, MAX_DESC * 2) || "Not Specified",
           type: type || "Not Specified",
-          amount: "Not Disclosed",
-          description: description.slice(0, MAX_DESC) || "Not Specified",
           time_added: time_added,
         };
       },
@@ -363,45 +139,34 @@ async function scrape() {
     const listPage = await context.newPage();
     await blockHeavyResources(listPage);
 
-    // PHASE 1: List Scraping
     for (let p = 1; p <= MAX_PAGES; p++) {
-      // Note: JB theme often uses AJAX or simple ?page=N.
-      // Based on debug, data-page="1" suggests standard param works.
       const targetUrl = p === 1 ? BASE_URL : `${BASE_URL}?page=${p}`;
       console.error(`[jobadverts] scraping page ${p}: ${targetUrl}`);
 
       await listPage.goto(targetUrl, {
         waitUntil: "networkidle",
         timeout: 30000,
-      }); // networkidle helps ensure JS-loaded rows appear
+      });
 
-      // Wait specifically for the JB rows
       await listPage
         .waitForSelector(".jb-job-list-row", { timeout: 15000 })
         .catch(() => {});
 
       const jobs = await listPage.evaluate(() => {
         const clean = (s) => (s || "").replace(/\s+/g, " ").trim();
-
-        // TARGET THE EXACT CLASS FROM DEBUG OUTPUT
         const cards = Array.from(document.querySelectorAll(".jb-job-list-row"));
 
         return cards
           .map((card) => {
             const linkEl = card.querySelector("a.jb-job-title-link");
             if (!linkEl) return null;
-
             const url = linkEl.href;
             const title = clean(linkEl.textContent);
-
-            // Try to grab location/type from list view if available (often sparse in JB theme)
-            // But primarily we rely on Detail Page enrichment now.
             let location = "Uganda";
             const locSpan = card.querySelector(
               ".jb-job-location, [class*='location'] span",
             );
             if (locSpan) location = clean(locSpan.textContent);
-
             return { title, url, location };
           })
           .filter((j) => j && j.url && j.title);
@@ -420,7 +185,6 @@ async function scrape() {
         `[jobadverts] page ${p}: found ${jobs.length} jobs, ${newCount} new. Total: ${allJobs.length}`,
       );
 
-      // If no new jobs, break
       if (newCount === 0) {
         console.error("[jobadverts] no new jobs found. Stopping pagination.");
         break;
@@ -434,7 +198,6 @@ async function scrape() {
       `[jobadverts] total unique jobs found: ${allJobs.length}. Fetching details...`,
     );
 
-    // PHASE 2: Concurrent Detail Enrichment
     const details = new Array(allJobs.length).fill(null);
     let nextIdx = 0;
 
@@ -448,37 +211,40 @@ async function scrape() {
 
     await Promise.all(Array.from({ length: DETAIL_CONCURRENCY }, worker));
 
-    // PHASE 3: Merge and Map
-    // PHASE 3: Merge and Map
+    // PHASE 3: Merge, sanitize, and tag with country
     return allJobs.map((j, i) => {
       const d = details[i];
 
-      // If detail scraping failed, fallback to basic list data
-      if (!d) {
-        return buildJobObject({
-          title: j.title,
-          location: j.location || "Uganda",
-          industry_sector: "Not Specified",
-          type: "Not Specified",
-          amount: "Not Disclosed",
-          time_added: new Date().toISOString(),
-          description: "Details unavailable.",
-          url_link: j.url,
-          employer: "Not Specified",
-        });
-      }
+      const rawTitle = (d && d.title) || j.title || "";
+      const rawDesc = (d && d.description) || "Not Specified";
+      const combined = stripHtml(rawDesc) + " " + rawTitle;
 
-      return buildJobObject({
-        title: d.title || j.title,
-        location: d.location || j.location || "Uganda",
-        industry_sector: d.industry_sector || "Not Specified",
-        type: d.type || "Not Specified",
-        amount: d.amount || "Not Disclosed",
-        time_added: d.time_added || new Date().toISOString(),
-        description: d.description || "Not Specified",
-        url_link: d.url_link || j.url,
-        employer: d.employer || "Not Specified",
+      // --- PATCH 1: Strip HTML from description ---
+      const description =
+        stripHtml(rawDesc).slice(0, MAX_DESC) || "Not Specified";
+
+      // --- PATCH 2: Strict location validator ---
+      const rawLoc = (d && d.location) || j.location || "";
+      const locMatch = (rawLoc + " " + description).match(CITY_RE);
+      const location = locMatch ? locMatch[1] : "Uganda";
+
+      // --- PATCH 3: Shared sector matcher (word-boundary safe) ---
+      const industry_sector = matchSector(combined);
+
+      const base = buildJobObject({
+        title: rawTitle,
+        url_link: j.url,
+        employer: (d && d.employer) || "Not Specified",
+        description,
+        location,
+        industry_sector,
+        type: (d && d.type) || "Not Specified",
+        amount: "Not Disclosed",
+        time_added: (d && d.time_added) || new Date().toISOString(),
       });
+
+      // --- PATCH 4: Multi-country tag ---
+      return Object.assign(base, { country: "Uganda" });
     });
   } catch (err) {
     console.error("[jobadverts] scrape failed:", err.message);
